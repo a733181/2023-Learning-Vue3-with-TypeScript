@@ -1,7 +1,8 @@
 <template>
   <div class="job-list">
+    <p>排序方式 {{ props.order }}</p>
     <ul>
-      <li v-for="job in props.jobs" :key="job.id">
+      <li v-for="job in orderJobs" :key="job.id">
         <h2>{{ job.title }} in {{ job.location }}</h2>
         <div class="salary">
           <p>
@@ -22,13 +23,35 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType } from 'vue';
+import { PropType, computed } from 'vue';
 import Job from '@/type/job';
+import OrderTeam from '@/type/order';
 
 const props = defineProps({
   jobs: {
     type: Array as PropType<Job[]>,
+    required: true,
   },
+  order: {
+    type: String as PropType<OrderTeam>,
+    required: true,
+  },
+});
+
+const orderEnName = computed(() => {
+  if (props.order === '名稱') {
+    return 'title';
+  } else if (props.order === '地點') {
+    return 'location';
+  } else {
+    return 'salary';
+  }
+});
+
+const orderJobs = computed(() => {
+  return [...props.jobs].sort((a: Job, b: Job) => {
+    return a[orderEnName.value] > b[orderEnName.value] ? 1 : -1;
+  });
 });
 </script>
 
